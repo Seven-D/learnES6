@@ -258,3 +258,64 @@ console.log(Object.keys(user));                //[ 'name', 'age' ]
 //用JSON的字符串化方法把user对象都打印出来，也看不到[MYKEY]属性。
 console.log(JSON.stringify(user));             //{"name":"Curry","age":29}
 ~~~
+
+L8  解构赋值 （destructuring assignment）
+================
+* 它是ES6里面一个比较新颖的变量赋值方式，非常常用和实用。
+##知识点
+  * 解构赋值的写法
+##实战学习
+~~~js
+//数组赋值
+let[a,b,c]=[10,20,30];
+console.log(a,b,c);  //10,20,30  //数组元素变量？
+
+//更灵活的写法,居然还有这种写法,作为语法，牢记就是了
+let[x,y,...other]=[1,2,3,4,5];
+console.log(x,y,other); //1 2 [3,4,5]  //other显然是一个数组了
+console.log(x,y,...other); //1 2 3 4 5 //...other是剩余的其它变量
+
+//对象赋值
+//这里非常常用在函数传参
+let {name,age}={name:'koma',age:20}
+console.log(name,age);  //koma  20
+
+//函数赋值 
+function func1() {  //定义一个函数，返回一个数组
+   return [10,20];
+}
+let [num1,num2] =func1(); //数组赋值
+console.log(num1,num2);  //10 20
+
+//函数参数名赋值
+//用法非常灵活，参数可有默认值，还不指定传参数个数，这个特性很棒哟~
+function func2({x=1,y=2}) { //定义一个函数，参数是一个对象，对象有两个属性x,y；默认值是1，2
+  return x+y; //返回参数
+}
+console.log(func2({}));  //3
+console.log(func2({x:10}));  //12
+console.log(func2({y:10}));  //11
+console.log(func2({x:10,y:20})); //30
+~~~
+L9  数组循环（for...of)
+===============
+##知识点
+  * 新的数组循环方式  (ES5原来是for...in)
+  * for of 与 for in 的区别
+    1、for of 只关心数组的值，而for in 会关心这个数组的所有（像是看一个对象），包括数值、扩展函数等等。
+  * 如果只是数组遍历值，建议用of,因为不用去关心这个数组里面是什么结构。
+  * 用for in是要循环对象用的。
+##实战演习：
+~~~js
+let list = [10, 20, 30];
+Array.prototype.Len = function () { //这里定义一个组数的扩展函数
+};
+for (let val of list)
+    console.log(val);//val直接取到元素值
+
+//ES5的写法
+for (var va1 in list)
+    console.log(va1, list[va1]);//获取到的va1只是数组的下标，要显示数组元素值得用list[va1]
+//同时会把上面那个扩展函数也打印出来
+
+~~~
