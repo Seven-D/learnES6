@@ -310,6 +310,7 @@ L9  数组循环（for...of)
 let list = [10, 20, 30];
 Array.prototype.Len = function () { //这里定义一个组数的扩展函数
 };
+
 for (let val of list)
     console.log(val);//val直接取到元素值
 
@@ -318,4 +319,234 @@ for (var va1 in list)
     console.log(va1, list[va1]);//获取到的va1只是数组的下标，要显示数组元素值得用list[va1]
 //同时会把上面那个扩展函数也打印出来
 
+~~~
+L10  函数的默认值
+===============
+##知识点
+  *  定义函数时给出参数的默认值。（在ES5中是没有这个功能的哦）
+##实战学习：
+~~~js
+//字符参数
+function sayHello(name="defaultParameterValue") {
+    console.log(`Hello,${name}`);
+}
+sayHello();//不传参数，将返回默认参数值结果：Hello,defaultParameter
+sayHello("myStringIsGo");// 结果：Hello,myStringIsGo
+
+//数值计算
+function myadd(a=1,b=a) { //定义b=a也是可以的
+    return a+b;
+}
+console.log(myadd()); //2
+console.log(myadd(10)); //20
+console.log(myadd(10,20)); //30
+
+//必须指定参数
+function required() {
+    throw new Error("参数未指定！"); //定义一个函数，抛出一个错误信息
+}
+function sayBye(name=required()) { //默认参数值是required函数
+    console.log(`${name} Bye!`);
+}
+sayBye("koma"); //传进参数，正常
+//sayBye();  //不传参数，就默认required函数，抛出错误信息
+
+~~~
+L11  可变长参数
+=============
+##知识点
+  * 定义函数时，可以将参数指定为可变数组。
+##实战演习：
+~~~js
+//定义一个求和函数，函数的参数个数不确定，也就是说随便你传几个参数~~神奇！
+function mySum(...args) {  //这个...就是表示不定长参数，可当作一个数组了。不确定你要传进来几个参数
+    let result = 0;
+    args.forEach(val => {  //用数组的forEach，这里用到箭头函数代替了function()的写法
+        result+=val;   //累加循环到的各元素值
+    });
+    return result;
+}
+console.log(mySum(1,2,3)); //6
+console.log(mySum(1,2,3,4,5,6));  //21
+//console.log(mySum(1,2,a,4,5));  //a is not defined
+~~~
+L12  箭头函数=> (Arrow function)
+==============================
+##知识点
+  *  通过箭头函数简化代码。这是ES6里面的新特性
+##实战演习：
+~~~js
+let list=[10,20,30];
+//ES5写法
+let newList=list.map(function (value,index) { //map是数组元素值循环,一个匿名函数，元素值，下标
+    return value * value; //输出元素值的平方
+});
+console.log(newList);
+
+//ES6的写法
+newList=list.map((value,index)=>{  //用箭头函数=>代替了function关键字  （注意，这里不能用let了哦，因为上面用过了，let阻止重复定义）
+    return value * value;
+});
+console.log(newList);
+
+//还可以更简化：index参数用不上，可以不写！甚至连参数的括号（）都可以不要！
+newList=list.map(value => {
+    return value * value;
+});
+console.log(newList);
+
+//最终三种方法输出的结果是一样的。代码是不是简洁了好多啊？感觉蛮精彩的，嘿嘿
+~~~
+L13  基本对象的定义
+================
+##知识点
+  *  JS基本对象的定义
+##实战演习：
+~~~JS
+//下面定义三个变量，作为标题、价格、出版社，可以看作是一本书的属性
+//但是如果属性多了，这样定义显得杂乱无章而且不好管理。
+let title = "ES6从入门到学会";
+let price = 25;
+let publish = "小马出版社";
+//用对象来定义一本书
+let book = {   //对象名book,对象体用{}来括起来
+    // 对象有三个属性
+    title,
+    price,
+    publish,
+    //对象有一个方法
+    toString() {
+        console.log(`<<${this.title}>> is ${price}元。`);//在这儿用this与不用都能引用到自己的成员变量
+    }
+};
+book['lang'] = "简体中文";//对象还可以追加属性，这里追加了一个语言的属性
+console.log(book);
+book.toString();
+/*结果：
+{ title: 'ES6从入门到学会',
+  price: 25,
+  publish: '小马出版社',
+  toString: [Function: toString],
+  lang: '简体中文' }
+<<ES6从入门到学会>> is 25元。
+* */
+~~~
+L14  类定义class
+===============
+##知识点
+  * ES6的类定义。  
+  * 在ES5中类似于类的概念是用function，别扭。在ES6中真正导入了class类的定义。
+##实战演习：
+~~~JS
+//定义一个类。class关键字，类名，类体用{}包围。
+class Player {
+    //定义构造器
+    constructor(name, sex) { //传入两个参数
+        this.name = name; //将参数赋给模板级的属性this
+        this.sex = sex;  //模板级的属性不必预先定义好，它自动帮你定义了，很方便，很简洁；
+    }
+
+    //定义一个类函数(方法）
+    show() {
+        console.log(`${this.name}的性别是${this.sex}。`);//引用了模板级的变量（用this），没问题。
+    }
+
+    //定义了一个静态方法，其它语言中也都有的。
+    /*什么叫静态方法？
+    就是不用实例化这个类就可以直接调用的方法。在ES6中提供了这个功能
+    因此面向对象的编程，用JS的ES6不会输其它语言哦
+    * */
+    static info() {
+        console.log("这是一个球员类，你可以使用它建立自己的球员。");
+    }
+}
+
+//如何使用一个类
+//用变量player来实例化一个类，关键字new，并传入参数
+let player= new Player("库里","男");
+//直接调用实例内部的变量（属性）
+console.log(player.name,player.sex);
+//调用实例内部的方法
+player.show();
+//注意，这里是类名，大写的P哦。说明可以直接调用类的静态属性。
+Player.info();
+~~~
+L15  setter和getter的定义
+=======================
+##知识点：
+  * 在类中定义setter/getter的方法
+  * setter:类属性的写入；getter：类属性的读取
+##实战学习：
+~~~JS
+class Player {
+    constructor(name, sex) {
+        this.name = name;
+        this.sex = sex;
+    }
+
+//定义getter
+    get age() {
+        return this._age;//这里下划线_只是他习惯于定义模板级变量加的字符，不是必须的。
+    }
+
+//定义setter
+    set age(val) {
+        this._age = val;
+    }
+}
+
+//使用getter/setter
+let player = new Player("库里", "男");
+console.log(player);//实例化之后，age未赋值之前，我们看看对象里是什么？
+player.age = 28; //这里调用的是setter方法，给_age赋值
+console.log(player);
+console.log(player.age); //这里调用的是getter方法,获取_age值
+/*
+*结果：
+Player { name: '库里', sex: '男' }     //注意到一点是，在没有赋值之前，_age属性是没有的。调用setter赋值后才有，这是JS灵活的地方。
+Player { name: '库里', sex: '男', _age: 28 }
+28
+* */
+~~~
+L16  类继承
+============
+##知识点：
+  *  ES6面向对象编程之类继承
+##实战学习：
+~~~JS
+//定义一个父类Car
+class Car {
+    constructor(brand) {
+        this.brand = brand; //传入品牌
+    }
+
+    show() {
+        console.log(`本台车的品牌是${this.brand}。`);
+    }
+}
+
+//定义一个子类Lexus
+//extends继承，也就是继承Car类
+class Lexus extends Car {
+    constructor(brand, lineup) { //品牌与分类（车型）
+        super(brand); //super意思是调用了父类的构造器传进的brand，这样会初始化brand的属性。
+        this.lineup = lineup;
+    }
+
+    getPrice() {
+        switch (this.lineup) {  //根据车型取价格
+            case "RX":
+                return 60;
+            case "NX":
+                return 40;
+            default:
+                throw new Error("未知车类别");
+        }
+    }
+}
+
+//使用继承
+let mycar = new Lexus("Lexus", "RX");
+mycar.show(); //这里调用了父方法；继承了
+console.log(`价格是：${mycar.getPrice()}万。`);//这里调用了本身的方法
 ~~~
