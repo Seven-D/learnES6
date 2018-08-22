@@ -550,3 +550,205 @@ let mycar = new Lexus("Lexus", "RX");
 mycar.show(); //这里调用了父方法；继承了
 console.log(`价格是：${mycar.getPrice()}万。`);//这里调用了本身的方法
 ~~~
+
+L17  循环我的对象
+=================
+##知识点
+  * 可换代的对象
+  * 迭代的方法
+##实战学习：
+~~~JS
+let list = [10, 20, 30];//数组对象
+let mystr = "你好啊！"; //字符串对象
+let mymap = new Map(); //JS中Map对象是指：键/值（key/value)对的集合。
+mymap.set('JS', 'JavaScript'); //向map对象添加元素
+mymap.set('PL', 'Perl');
+mymap.set('PY', 'Python');
+//循环数组对象
+for (let val of list) {
+    console.log(val);
+}
+//循环字符串对象
+for (let val of mystr) {
+    console.log(val);
+}
+//循环Map对象
+for (let [key, value] of mymap) {
+    console.log(key, value);
+}
+
+let it = mymap.values();//将values属性赋给it,称为迭代器
+let tmp;
+while (tmp = it.next()) {  //next方法是取得Map对象的下一个值
+    if (tmp.done) break;//(done是取完的意思）如果tmp没有下一个值 ，就退出
+    //console.log(tmp.value, tmp.done);
+    console.log(tmp);
+}
+~~~
+
+L18  可迭代的对象
+===============
+##知识点
+  * 可迭代对象：能够用for of \ for in \let in等进行循环的对象
+  * 制作一个可迭代对象
+  * Symbol.iterator //这是Symbol类型内部唯一ID，作为迭代器
+##实战学习：
+~~~JS
+//定义一个可迭代对象
+class Player {
+    constructor(list) {   //构造器接收一个list，数组
+        this.list = list;
+    }
+
+//重点在这儿：[Symbol.iterator]()这个就是个迭代器，固定写法，死记
+    [Symbol.iterator]() { //里面是迭代器的内容
+        let current = 0;//定义当前索引
+        let that = this; //因为this在不同地方的作用域不一样，在这儿我们要用到整个对象，所以通过这句把this转义到that身上。
+        return {
+            next() { //next接口函数，用于每一次迭代
+                //如果当前索引小于对象传进来的list的长度，返回一个对象{value：当前索引对应的值，加上结束标记done:false};
+                //如果当前索引等于大于list的长度，返回对象{结束标记done:true}
+                //done是接口定义，固定写法
+                return current < that.list.length ? {value: that.list[current++], done: false} : {done: true};
+            }
+        }
+    }
+}
+
+let player = new Player(["Curry", "Harden", "LeBron"]);//实例化player，传进一个数组
+for (let tmp of player) { //用for of来使用player,在这个位置上player就是一个可迭代对象
+    console.log(tmp);//取出player的每个值并输出
+}
+~~~
+L19  简单迭代生成器
+================
+##知识点
+  * function *迭代器名(){}：迭代生成器  //区分函数定义哦：function 函数名（）{} 
+  * yield  迭代返回            //区分函数的返回哦：return
+##实战演习：
+~~~JS
+//定义一个简单的迭代器myGenerator，每一次调用返回一个字符
+function* myGenerator() {
+    yield "一";
+    yield '条';
+    yield '大';
+    yield '河';
+}
+
+for (let val of myGenerator()) {
+    console.log(val);
+}
+//定义一个迭代器countdown，从大数到小呗
+function* countdown(begin) { //传入一个初始值begin
+    while (begin > 0) {
+        yield begin--;//begin--就是每调用一次减一次呗，相对于begin++
+    }
+}
+
+for (let tmp of countdown(5)) {
+    console.log(tmp);
+}
+~~~
+L20  简单的迭代类
+===============
+##知识点
+  * 建立一个简单的迭代类（yield）
+##实战演习：
+~~~JS
+//定义一个可迭代的类
+class MyList {
+    constructor(list) {
+        this.list = list;
+        //建立自己的迭代属性，该属性由迭代生成器来生成
+        //注意区别于上上期的内容，上上期是在[Symbol.iterator]方法下用next（）函数与return返回；
+        //这里我们让对象的[Symbol.iterator]等于一个迭代生成器，生成器用yield返回。这样显示代码更简单，有木有？
+        this[Symbol.iterator] = function* () {
+            let current = 0;
+            let that = this;
+            //yield迭代输出
+            while (current < that.list.length) {
+                yield that.list[current++];
+            }
+        }
+    }
+}
+
+//用法与上上期用法一样：实例化，循环对象，输出每个元素值
+let mylist = new MyList([100, 200, 300, 400, 500]);
+for (let val of mylist) {
+    console.log(val);
+}
+~~~
+L21  模块化设计
+=============
+在我们实际项目开发中，不可能将所有的类、方法、函数等都写在同一个文件中。
+这样造成文件大，代码可读性差，不好管理。
+我们会建立不同的目录，存放不同功能的文件，每个文件存分类好的一些类、方法、函数等，方便管理
+这就是模块化设计。
+##知识点
+  * 建立一个模块
+  * 调用模块的功能
+##实战演习：
+* 因为目前node.js对模块化的支持还在测试阶段，所以它用mjs的后缀名来作为模块文件
+* 它的执行方法与js文件的执行方法也不一样，看下面
+* 这里只是就课程内容讲解模块化设计，在实际项目开发中不推荐用这种方法，应该用babel的第三方模块！
+###math.mjs 文件
+~~~JS
+//定义两个函数，加法，减法
+function add(x, y) {
+    return x + y;
+}
+
+function min(x, y) {
+    return x - y;
+}
+//导出函数
+export {add,min};
+~~~
+###main.mjs 文件
+~~~JS
+import {add, min} from './math'; //导入需要用的方法，来自哪个模块文件
+//调用方法
+console.log(add(10, 20));
+console.log(min(30, 20));
+~~~
+###执行方法
+~~~bash
+node --experimental-modules main.mjs
+~~~
+L22  类模块设计
+=============
+##知识点
+  * 类模块设计和引用
+##实战学习：
+### Player.mjs 文件
+~~~JS
+//定义一个类
+class Player {
+    //构造器
+    constructor(name) {
+        this.name = name;
+    }
+
+    //方法
+    SayHello() {
+        console.log(`Hello,${this.name}。`);
+    }
+}
+
+//导出类
+export default Player;
+~~~
+### main.js 文件
+~~~JS
+import Player from './Player'; //导入类
+
+let curry = new Player('库里'); //引用类
+curry.SayHello();
+~~~
+###执行方法
+~~~bash
+node --experimental-modules main.mjs
+~~~
+于ES6的课程学习至此结束，谢谢。
+========
